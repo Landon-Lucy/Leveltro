@@ -2,15 +2,17 @@ namespace Leveltro;
 
 public class Enchantment
 {
-    readonly string Name;
-    readonly string EffectDescription;
-    readonly int MoneyCost;
-    readonly bool AffectsSpells;
-    readonly bool AffectsMobs;
-    readonly bool AffectsScore;
-    readonly bool GivesMoney;
+    public string Name;
+    public string EffectDescription;
+    public int MoneyCost;
+    public bool AffectsSpells;
+    public bool AffectsMobs;
+    public bool AffectsScore;
+    public bool GivesMoney;
+    public int Rarity;
+    public bool StartOfCombat;
 
-    public Enchantment(string name, string effectDescription, int moneyCost, bool affectsSpells, bool affectsMobs, bool affectsScore, bool givesMoney)
+    public Enchantment(string name, string effectDescription, int moneyCost, bool affectsSpells, bool affectsMobs, bool affectsScore, bool givesMoney, bool startOfCombat, int rarity)
     {
         Name = name;
         EffectDescription = effectDescription;
@@ -19,28 +21,25 @@ public class Enchantment
         AffectsMobs = affectsMobs;
         AffectsScore = affectsScore;
         GivesMoney = givesMoney;
+        StartOfCombat = startOfCombat;
+        Rarity = rarity;
     }
 }
 
-public class EnchantmentBoard
+public static class EnchantmentBoard
 {
- public List<Enchantment> Enchantments;
- public int TotalEnchantments => Enchantments.Count;
- public int CurrentEnchantmentMax;
+    public static List<Enchantment> Enchantments;
+    public static int TotalEnchantments => Enchantments.Count;
+    public static int CurrentEnchantmentMax = 5;
 
-  public EnchantmentBoard()
-  {
-    Enchantments = new();
-    CurrentEnchantmentMax = 5;
-  }
 
-  public void AddEnchantment(Mob mob)
-  {
+    public static void AddEnchantment(Mob mob)
+    {
 
-  }
+    }
 
-  public void SwapEnchantmentPositions(int mobSlot1, int mobSlot2)
-  {
+    public static void SwapEnchantmentPositions(int mobSlot1, int mobSlot2)
+    {
 
-  }
+    }
 }

@@ -9,8 +9,9 @@ public class Mob
     readonly int BaseHP;
     readonly int MoneyCost;
     readonly string MobDescription;
+    readonly int Rarity;
 
-    public Mob(string type, string mobName, int baseXPPerUnit, int baseQuantity, int baseHP, int moneyCost, string mobDescription)
+    public Mob(string type, string mobName, int baseXPPerUnit, int baseQuantity, int baseHP, int moneyCost, string mobDescription, int rarity)
     {
         Type = type;
         MobName = mobName;
@@ -19,9 +20,10 @@ public class Mob
         BaseHP = baseHP;
         MoneyCost = moneyCost;
         MobDescription = mobDescription;
+        Rarity = rarity;
     }
 
-    public (int quantity, int xpPerUnit) CalcTotals(EnchantmentBoard enchBoard)
+    public (int quantity, int xpPerUnit) CalcTotals()
     {
         return (-1, -1);
     }
@@ -32,24 +34,19 @@ public class Mob
     }
 }
 
-public class MobBoard
+public static class MobBoard
 {
- public List<Mob> Mobs;
- public int TotalMobs => Mobs.Count;
- public int CurrentMobMax;
+ public static List<Mob> Mobs = new();
+ public static int TotalMobs => Mobs.Count;
+ public static int CurrentMobMax = 5;
 
-  public MobBoard()
-  {
-    Mobs = new();
-    CurrentMobMax = 5;
-  }
 
-  public void AddMob(Mob mob)
+  public static void AddMob(Mob mob)
   {
 
   }
 
-  public void SwapMobPositions(int mobSlot1, int mobSlot2)
+  public static void SwapMobPositions(int mobSlot1, int mobSlot2)
   {
 
   }

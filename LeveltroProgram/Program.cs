@@ -1,2 +1,13 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Leveltro;
+
+Console.Clear();
+
+Console.WriteLine("Welcome to Leveltro");
+Console.WriteLine("Press any key to start");
+
+Console.ReadKey();
+
+Console.Clear();
+Generator.CreateAll();
+Generator.BuildInitialDeck();
+
