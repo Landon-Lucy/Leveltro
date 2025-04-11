@@ -2,14 +2,14 @@ namespace Leveltro;
 
 public class Mob
 {
-    readonly string Type;
-    readonly string MobName;
-    readonly int BaseXPPerUnit;
-    readonly int BaseQuantity;
-    readonly int BaseHP;
-    readonly int MoneyCost;
-    readonly string MobDescription;
-    readonly int Rarity;
+    public string Type;
+    public string MobName;
+    public int BaseXPPerUnit;
+    public int BaseQuantity;
+    public int BaseHP;
+    public int MoneyCost;
+    public string MobDescription;
+    public int Rarity;
 
     public Mob(string type, string mobName, int baseXPPerUnit, int baseQuantity, int baseHP, int moneyCost, string mobDescription, int rarity)
     {
