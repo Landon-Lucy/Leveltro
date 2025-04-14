@@ -6,13 +6,16 @@ Generator.BuildInitialMobAndEnchant();
 
 int combat1Score = 20;
 
-Console.Clear();
+try { Console.Clear(); }
+catch { }
 
 Console.WriteLine("Welcome to Leveltro");
 Console.WriteLine("Press any key to start");
 
-Console.ReadKey();
+try { Console.ReadKey(); }
+catch { }
 
-Console.Clear();
+try { Console.Clear(); }
+catch { }
 
-CombatRunner.StartCombat(3, combat1Score);
+CombatRunner.StartCombat(combat1Score);

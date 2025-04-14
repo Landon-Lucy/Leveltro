@@ -25,6 +25,7 @@ public static class Generator
     public static void BuildInitialMobAndEnchant()
     {
         MobBoard.Mobs.Add(AllMobs[0]);
+        MobBoard.Mobs.Add(AllMobs[0]);
         EnchantmentBoard.Enchantments.Add(AllEnchantments[0]);
     }
 
@@ -41,6 +42,6 @@ public static class Generator
 
     public static void CreateAllSpells()
     {
-        AllSpells.Add(new Spell("Spark", 5, "Deals [5 Damage] to the front monster", false, 1, 1, -1));
+        AllSpells.Add(new Spell("Spark", 5, "Deals [5 Damage] to the front monster", false, 1, 1, -1, null));
     }
 }
