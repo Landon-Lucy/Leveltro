@@ -19,3 +19,4 @@ try { Console.Clear(); }
 catch { }
 
 CombatRunner.StartCombat(combat1Score);
+

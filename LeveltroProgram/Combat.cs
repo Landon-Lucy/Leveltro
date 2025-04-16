@@ -9,9 +9,11 @@ public static class CombatRunner
     public static int MaxMana = 3;
     public static int[] damageToEachSlot = [0, 0, 0, 0, 0];
     public static int ScoreBenchmark;
+    public static int HandSize = 5;
     public static void StartCombat(int scoreBenchmark, int handSize = 5)
     {
         ScoreBenchmark = scoreBenchmark;
+        HandSize = handSize;
         Deck.CurrentDeck = new List<Spell>(Deck.FullDeck);
 
         for (int i = 0; i < handSize; i++)
@@ -44,9 +46,18 @@ public static class CombatRunner
             }
         }
 
+        CurrentMana = MaxMana;
+
+
+        int currentHandSize = Deck.CurrentHand.Count();
+        for (int i = 0; i < HandSize - currentHandSize; i++)
+        {
+            Deck.Draw();
+            CurrentMana = MaxMana;
+        }
+
         UpdateScreen();
 
-        CurrentMana = MaxMana;
 
         bool turnEnded = false;
         while (!turnEnded)
@@ -63,15 +74,20 @@ public static class CombatRunner
                     playerChoiceObj = Console.ReadKey(true);
                     playerChoiceChar = playerChoiceObj.KeyChar;
                 }
-                catch { playerChoiceChar = '1'; }
+                catch { playerChoiceChar = '0'; }
                 string playerChoiceString = playerChoiceChar.ToString();
 
                 try
                 {
                     playerChoice = Convert.ToInt32(playerChoiceString);
-                    if (playerChoice >= 0 && playerChoice < Deck.CurrentHand.Count())
+                    if (playerChoice == 0)
                     {
-                        if (CurrentMana >= Deck.CurrentHand[playerChoice].ManaCost)
+                        validChoice = true;
+                        break;
+                    }
+                    if (playerChoice > 0 && playerChoice <= Deck.CurrentHand.Count())
+                    {
+                        if (CurrentMana >= Deck.CurrentHand[playerChoice - 1].ManaCost)
                         {
                             validChoice = true;
                             break;
@@ -86,44 +102,49 @@ public static class CombatRunner
                 turnEnded = true;
                 EndTurn();
             }
-
-            Spell playedCard = Deck.CurrentHand[playerChoice];
-
-            if (playedCard.HitsAll)
-            {
-                for (int i = 0; i < MobBoard.Mobs.Count(); i++)
-                {
-                    if (damageToEachSlot[i] < int.MaxValue)
-                        damageToEachSlot[i] += playedCard.BaseDamage;
-
-                    DetectAndRewardKill(i);
-                }
-            }
             else
             {
-                for (int i = 0; i < MobBoard.Mobs.Count(); i++)
+                playerChoice--;
+
+                Spell playedCard = Deck.CurrentHand[playerChoice];
+
+                if (playedCard.HitsAll)
                 {
-                    if (damageToEachSlot[i] < MobBoard.Mobs[i].BaseHP)
+                    for (int i = 0; i < MobBoard.Mobs.Count(); i++)
                     {
-                        damageToEachSlot[i] += playedCard.BaseDamage;
+                        if (damageToEachSlot[i] < int.MaxValue)
+                            damageToEachSlot[i] += playedCard.BaseDamage;
 
                         DetectAndRewardKill(i);
-
-                        break;
                     }
                 }
+                else
+                {
+                    for (int i = 0; i < MobBoard.Mobs.Count(); i++)
+                    {
+                        if (damageToEachSlot[i] < MobBoard.Mobs[i].BaseHP)
+                        {
+                            damageToEachSlot[i] += playedCard.BaseDamage;
+
+                            DetectAndRewardKill(i);
+
+                            break;
+                        }
+                    }
+                }
+
+                if (playedCard.Effect != null)
+                {
+                    playedCard.Effect();
+                }
+
+                CurrentMana -= playedCard.ManaCost;
+
+                Deck.Discard(playerChoice);
+
+                UpdateScreen();
             }
 
-            if (playedCard.Effect != null)
-            {
-                playedCard.Effect();
-            }
-
-            CurrentMana -= playedCard.ManaCost;
-
-            Deck.Discard(playerChoice);
-
-            UpdateScreen();
 
         }
     }
@@ -149,7 +170,9 @@ public static class CombatRunner
 
         CurrentTurn++;
 
-        if (CurrentTurn <= TotalTurns)
+        if (CurrentScore >= ScoreBenchmark)
+            EndCombat();
+        else if (CurrentTurn <= TotalTurns)
             PlayerTurn();
         else
             EndCombat();
@@ -197,6 +220,21 @@ public static class CombatRunner
 
     public static void EndCombat()
     {
+        if (CurrentScore < ScoreBenchmark)
+        {
+            try { Console.Clear(); }
+            catch { }
 
+            Console.WriteLine($"XP: {CurrentScore} / {ScoreBenchmark}");
+            Console.WriteLine("Insufficient XP gained - GAME OVER");
+            Environment.Exit(0);
+        }
+        else
+        {
+            try { Console.Clear(); }
+            catch { }
+
+            
+        }
     }
 }
