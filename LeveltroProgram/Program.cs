@@ -18,5 +18,6 @@ catch { }
 try { Console.Clear(); }
 catch { }
 
-CombatRunner.StartCombat(combat1Score);
+// CombatRunner.StartCombat(combat1Score);
 
+ShopRunner.DisplayShop();
