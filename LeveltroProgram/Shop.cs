@@ -5,6 +5,20 @@ public static class ShopRunner
     // public static List<Enchantment> EnchantmentsOnSale;
     // public static List<Spell> SpellsOnSale;
 
+    public static List<int> shopSlotsPurchased = new();
+    public static List<Mob> shopMobs = new();
+    public static List<Enchantment> shopEnchantments = new();
+    public static List<Spell> shopSpells = new();
+
+    public static void GenerateShop()
+    {
+        shopMobs = GenerateMobs();
+        shopEnchantments = GenerateEnchantments();
+        shopSpells = GenerateSpells();
+
+        DisplayShop();
+    }
+
     public static void DisplayShop()
     {
         try { Console.Clear(); }
@@ -22,7 +36,7 @@ public static class ShopRunner
         Console.WriteLine();
         Console.WriteLine();
 
-        foreach(Enchantment enchantment in EnchantmentBoard.Enchantments)
+        foreach (Enchantment enchantment in EnchantmentBoard.Enchantments)
         {
             Console.Write($"{enchantment.Name}  ");
         }
@@ -30,13 +44,17 @@ public static class ShopRunner
         Console.WriteLine();
         Console.WriteLine();
 
-        List<Mob> shopMobs = GenerateMobs();
-
         int numberIndicator = 1;
         string rarity = "";
 
         foreach (Mob mob in shopMobs)
         {
+            if (shopSlotsPurchased.Contains(numberIndicator))
+            {
+                Console.WriteLine($"{numberIndicator} - PURCHASED");
+                numberIndicator++;
+                continue;
+            }
             if (mob.Rarity == 0)
                 rarity = "Common";
             else if (mob.Rarity == 1)
@@ -51,10 +69,15 @@ public static class ShopRunner
 
         Console.WriteLine();
 
-        List<Enchantment> shopEnchantments = GenerateEnchantments();
 
         foreach (Enchantment enchantment in shopEnchantments)
         {
+            if (shopSlotsPurchased.Contains(numberIndicator))
+            {
+                Console.WriteLine($"{numberIndicator} - PURCHASED");
+                numberIndicator++;
+                continue;
+            }
             if (enchantment.Rarity == 0)
                 rarity = "Common";
             else if (enchantment.Rarity == 1)
@@ -68,10 +91,15 @@ public static class ShopRunner
 
         Console.WriteLine();
 
-        List<Spell> shopSpells = GenerateSpells();
 
         foreach (Spell spell in shopSpells)
         {
+            if (shopSlotsPurchased.Contains(numberIndicator))
+            {
+                Console.WriteLine($"{numberIndicator} - PURCHASED");
+                numberIndicator++;
+                continue;
+            }
             if (spell.Rarity == 0)
                 rarity = "Common";
             else if (spell.Rarity == 1)
@@ -82,6 +110,101 @@ public static class ShopRunner
             Console.WriteLine($"{numberIndicator} ({rarity}) -- ${spell.MoneyCost}: {spell.SpellName} - {spell.SpellDescription}");
             numberIndicator++;
         }
+
+        playerPurchaseStep(numberIndicator - 1, shopMobs, shopEnchantments, shopSpells);
+    }
+
+    public static void playerPurchaseStep(int shopSize, List<Mob> shopMobs, List<Enchantment> shopEnchantments, List<Spell> shopSpells)
+    {
+        bool validChoice = false;
+        int playerChoice = -1;
+        while (!validChoice)
+        {
+            ConsoleKeyInfo playerChoiceObj = new();
+            char playerChoiceChar;
+            try
+            {
+                playerChoiceObj = Console.ReadKey(true);
+                playerChoiceChar = playerChoiceObj.KeyChar;
+            }
+            catch { playerChoiceChar = '0'; }
+            string playerChoiceString = playerChoiceChar.ToString();
+
+            try
+            {
+                playerChoice = Convert.ToInt32(playerChoiceString);
+                if (playerChoice == 0)
+                {
+                    validChoice = true;
+                    break;
+                }
+                if (playerChoice > 0 && playerChoice <= shopSize)
+                {
+                    if (playerChoice == 0)
+                    {
+                        validChoice = true;
+                        break;
+                    }
+                    else
+                    {
+                        if (playerChoice <= shopMobs.Count())
+                        {
+                            if (PlayerInfo.CurrentMoney >= shopMobs[playerChoice - 1].MoneyCost && MobBoard.Mobs.Count() < MobBoard.CurrentMobMax)
+                            {
+                                validChoice = true;
+                                break;
+                            }
+                        }
+                        else if (playerChoice <= shopMobs.Count() + shopEnchantments.Count())
+                        {
+                            if (PlayerInfo.CurrentMoney >= shopEnchantments[playerChoice - shopMobs.Count() - 1].MoneyCost && EnchantmentBoard.Enchantments.Count() < EnchantmentBoard.CurrentEnchantmentMax)
+                            {
+                                validChoice = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (PlayerInfo.CurrentMoney >= shopSpells[playerChoice - shopMobs.Count() - shopEnchantments.Count() - 1].MoneyCost)
+                            {
+                                validChoice = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { continue; }
+        }
+
+        if (playerChoice == 0)
+        {
+            shopSlotsPurchased = new();
+            return;
+        }
+        else
+        {
+            if (playerChoice <= shopMobs.Count())
+            {
+                PlayerInfo.CurrentMoney -= shopMobs[playerChoice - 1].MoneyCost;
+                MobBoard.AddMob(shopMobs[playerChoice - 1]);
+                shopSlotsPurchased.Add(playerChoice);
+            }
+            else if (playerChoice <= shopMobs.Count() + shopEnchantments.Count())
+            {
+                PlayerInfo.CurrentMoney -= shopEnchantments[playerChoice - shopMobs.Count() - 1].MoneyCost;
+                EnchantmentBoard.AddEnchantment(shopEnchantments[playerChoice - shopMobs.Count() - 1]);
+                shopSlotsPurchased.Add(playerChoice);
+            }
+            else
+            {
+                PlayerInfo.CurrentMoney -= shopSpells[playerChoice - shopMobs.Count() - shopEnchantments.Count() - 1].MoneyCost;
+                Deck.AddSpell(shopSpells[playerChoice - shopMobs.Count() - shopEnchantments.Count() - 1]);
+                shopSlotsPurchased.Add(playerChoice);
+            }
+            DisplayShop();
+        }
+
     }
 
     public static List<Mob> GenerateMobs()
@@ -156,8 +279,6 @@ public static class ShopRunner
         }
         return returnList;
     }
-
-
     public static List<Enchantment> GenerateEnchantments()
     {
         List<Enchantment> returnList = new();

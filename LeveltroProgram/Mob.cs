@@ -43,7 +43,7 @@ public static class MobBoard
 
   public static void AddMob(Mob mob)
   {
-
+    MobBoard.Mobs.Add(mob);
   }
 
   public static void SwapMobPositions(int mobSlot1, int mobSlot2)

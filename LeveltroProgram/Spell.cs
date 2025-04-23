@@ -70,4 +70,9 @@ public static class Deck
         Random rng = new Random();
         CurrentDeck = CurrentDeck.OrderBy(_ => rng.Next()).ToList();
     }
+
+        public static void AddSpell(Spell spell)
+    {
+        FullDeck.Add(spell);
+    }
 }

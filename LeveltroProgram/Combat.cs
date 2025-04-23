@@ -7,7 +7,7 @@ public static class CombatRunner
     public static int TotalTurns = 3;
     public static int CurrentTurn = 1;
     public static int MaxMana = 3;
-    public static int[] damageToEachSlot = [0, 0, 0, 0, 0];
+    public static List<int> damageToEachSlot = [0, 0, 0, 0, 0];
     public static int ScoreBenchmark;
     public static int HandSize = 5;
     public static void StartCombat(int scoreBenchmark, int handSize = 5)
@@ -234,7 +234,18 @@ public static class CombatRunner
             try { Console.Clear(); }
             catch { }
 
-            
+            Deck.CurrentHand = new();
+            Deck.CurrentDeck = new();
+            Deck.CurrentDiscard = new();
+
+            CurrentScore = 0;
+
+            for (int i = 0; i < damageToEachSlot.Count(); i++)
+            {
+                damageToEachSlot[i] = 0;
+            }
+
+            CurrentTurn = 1;
         }
     }
 }

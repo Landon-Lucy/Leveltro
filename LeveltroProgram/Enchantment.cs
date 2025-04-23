@@ -39,12 +39,12 @@ public static class EnchantmentBoard
     public static int CurrentEnchantmentMax = 5;
 
 
-    public static void AddEnchantment(Mob mob)
+    public static void AddEnchantment(Enchantment enchantment)
     {
-
+        EnchantmentBoard.Enchantments.Add(enchantment);
     }
 
-    public static void SwapEnchantmentPositions(int mobSlot1, int mobSlot2)
+    public static void SwapEnchantmentPositions(int enchantmentSlot1, int enchantmentSlot2)
     {
 
     }
