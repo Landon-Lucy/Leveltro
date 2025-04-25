@@ -24,9 +24,9 @@ public class Spell
         Effect = effect;
     }
 
-    public void OnPlay(int currentMana)
+    public void OnPlay()
     {
-
+        Effect();
     }
 }
 

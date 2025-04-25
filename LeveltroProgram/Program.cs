@@ -12,11 +12,11 @@ catch { }
 
 Console.WriteLine("Welcome to Leveltro");
 Console.WriteLine("Press any key to start");
+try { Console.ReadKey(); }
+catch { }
 
 while (true)
 {
-    try { Console.ReadKey(); }
-    catch { }
 
     try { Console.Clear(); }
     catch { }

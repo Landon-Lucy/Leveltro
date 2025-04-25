@@ -28,20 +28,23 @@ public static class ShopRunner
         Console.WriteLine();
         Console.WriteLine($"Current Cash: {PlayerInfo.CurrentMoney}");
         Console.WriteLine();
+
+        Console.WriteLine($"Enemies: {MobBoard.Mobs.Count()} / {MobBoard.CurrentMobMax}");
         foreach (Mob mob in MobBoard.Mobs)
         {
-            Console.Write($"{mob.MobName}  ");
+            Console.Write($"{mob.MobName}(HP: {mob.BaseHP} #: {mob.BaseQuantity} XP: {mob.BaseXPPerUnit * mob.BaseQuantity})  ");
         }
 
         Console.WriteLine();
         Console.WriteLine();
 
+        Console.WriteLine($"Enchantments: {EnchantmentBoard.Enchantments.Count()} / {EnchantmentBoard.CurrentEnchantmentMax}");
         foreach (Enchantment enchantment in EnchantmentBoard.Enchantments)
         {
-            Console.Write($"{enchantment.Name}  ");
+            Console.Write($"{enchantment.Name} ({enchantment.EffectDescription}) ");
+            Console.WriteLine();
         }
 
-        Console.WriteLine();
         Console.WriteLine();
 
         int numberIndicator = 1;
@@ -111,6 +114,11 @@ public static class ShopRunner
             numberIndicator++;
         }
 
+        Console.WriteLine();
+        Console.WriteLine("0 - Next Round");
+        Console.WriteLine("d - View Deck");
+        Console.WriteLine("s - Swap or Sell Enchantments");
+        Console.WriteLine("e - Swap or Sell Enemies");
         playerPurchaseStep(numberIndicator - 1, shopMobs, shopEnchantments, shopSpells);
     }
 
@@ -130,6 +138,38 @@ public static class ShopRunner
             catch { playerChoiceChar = '0'; }
             string playerChoiceString = playerChoiceChar.ToString();
 
+            if (playerChoiceString == "d")
+            {
+                try { Console.Clear(); }
+                catch { }
+
+                Console.WriteLine("Your Deck (Press any key to return to Shop)");
+                foreach (Spell spell in Deck.FullDeck)
+                {
+                    Console.WriteLine(spell.SpellName);
+                }
+
+                try { Console.ReadKey(true); }
+                catch { }
+
+                playerChoiceString = "0";
+                DisplayShop();
+            }
+
+            if (playerChoiceString == "s")
+            {
+                SwapSellEnchantments();
+                playerChoiceString = "0";
+                DisplayShop();
+            }
+
+            if (playerChoiceString == "e")
+            {
+                SwapSellMobs();
+                playerChoiceString = "0";
+                DisplayShop();
+            }
+
             try
             {
                 playerChoice = Convert.ToInt32(playerChoiceString);
@@ -138,44 +178,38 @@ public static class ShopRunner
                     validChoice = true;
                     break;
                 }
-                if (playerChoice > 0 && playerChoice <= shopSize)
+                else if (playerChoice > 0 && playerChoice <= shopSize)
                 {
-                    if (playerChoice == 0)
+                    if (playerChoice <= shopMobs.Count())
                     {
-                        validChoice = true;
-                        break;
+                        if (PlayerInfo.CurrentMoney >= shopMobs[playerChoice - 1].MoneyCost && MobBoard.Mobs.Count() < MobBoard.CurrentMobMax)
+                        {
+                            validChoice = true;
+                            break;
+                        }
+                    }
+                    else if (playerChoice <= shopMobs.Count() + shopEnchantments.Count())
+                    {
+                        if (PlayerInfo.CurrentMoney >= shopEnchantments[playerChoice - shopMobs.Count() - 1].MoneyCost && EnchantmentBoard.Enchantments.Count() < EnchantmentBoard.CurrentEnchantmentMax)
+                        {
+                            validChoice = true;
+                            break;
+                        }
                     }
                     else
                     {
-                        if (playerChoice <= shopMobs.Count())
+                        if (PlayerInfo.CurrentMoney >= shopSpells[playerChoice - shopMobs.Count() - shopEnchantments.Count() - 1].MoneyCost)
                         {
-                            if (PlayerInfo.CurrentMoney >= shopMobs[playerChoice - 1].MoneyCost && MobBoard.Mobs.Count() < MobBoard.CurrentMobMax)
-                            {
-                                validChoice = true;
-                                break;
-                            }
-                        }
-                        else if (playerChoice <= shopMobs.Count() + shopEnchantments.Count())
-                        {
-                            if (PlayerInfo.CurrentMoney >= shopEnchantments[playerChoice - shopMobs.Count() - 1].MoneyCost && EnchantmentBoard.Enchantments.Count() < EnchantmentBoard.CurrentEnchantmentMax)
-                            {
-                                validChoice = true;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if (PlayerInfo.CurrentMoney >= shopSpells[playerChoice - shopMobs.Count() - shopEnchantments.Count() - 1].MoneyCost)
-                            {
-                                validChoice = true;
-                                break;
-                            }
+                            validChoice = true;
+                            break;
                         }
                     }
                 }
             }
+
             catch { continue; }
         }
+
 
         if (playerChoice == 0)
         {
@@ -205,6 +239,169 @@ public static class ShopRunner
             DisplayShop();
         }
 
+    }
+
+
+    public static void SwapSellEnchantments()
+    {
+        while (true)
+        {
+            try { Console.Clear(); }
+            catch { }
+
+            Console.WriteLine("To sell an enchanmtent, press its number and then 's'.");
+            Console.WriteLine("To swap enchantments, press both their numbers.");
+            Console.WriteLine("To exit, press 0");
+
+            int i = 1;
+            foreach (Enchantment enchantment in EnchantmentBoard.Enchantments)
+            {
+                Console.WriteLine(i + " - " + enchantment.Name + " - " + (enchantment.MoneyCost + 1) / 2);
+                i++;
+            }
+
+            ConsoleKeyInfo playerEnchChoiceObj1 = new();
+            char playerEnchChoiceChar1;
+            try
+            {
+                playerEnchChoiceObj1 = Console.ReadKey(true);
+                playerEnchChoiceChar1 = playerEnchChoiceObj1.KeyChar;
+            }
+            catch { playerEnchChoiceChar1 = '0'; }
+            string playerEnchChoiceString1 = playerEnchChoiceChar1.ToString();
+
+            if (playerEnchChoiceString1 == "0")
+                break;
+
+            Console.WriteLine();
+            Console.Write(playerEnchChoiceString1 + " - ");
+
+            ConsoleKeyInfo playerEnchChoiceObj2 = new();
+            char playerEnchChoiceChar2;
+            try
+            {
+                playerEnchChoiceObj2 = Console.ReadKey(true);
+                playerEnchChoiceChar2 = playerEnchChoiceObj2.KeyChar;
+            }
+            catch { playerEnchChoiceChar2 = '0'; }
+            string playerEnchChoiceString2 = playerEnchChoiceChar2.ToString();
+
+            if (playerEnchChoiceString2 == "0")
+                break;
+
+            Console.Write(playerEnchChoiceString2);
+
+
+            if (playerEnchChoiceString2 != "s")
+            {
+                try
+                {
+                    int playerEnchChoice1 = Convert.ToInt32(playerEnchChoiceString1);
+                    int playerEnchChoice2 = Convert.ToInt32(playerEnchChoiceString2);
+
+                    if (playerEnchChoice1 > 0 && playerEnchChoice2 > 0 &&
+                    playerEnchChoice1 <= EnchantmentBoard.Enchantments.Count() && playerEnchChoice2 <= EnchantmentBoard.Enchantments.Count())
+                    {
+                        EnchantmentBoard.SwapEnchantmentPositions(playerEnchChoice1 - 1, playerEnchChoice2 - 1);
+                    }
+                }
+                catch { }
+            }
+            else
+            {
+                try
+                {
+                    int playerEnchChoice1 = Convert.ToInt32(playerEnchChoiceString1);
+
+                    if (playerEnchChoice1 > 0 && playerEnchChoice1 <= EnchantmentBoard.Enchantments.Count())
+                    {
+                        EnchantmentBoard.SellEnchantment(playerEnchChoice1 - 1);
+                    }
+                }
+                catch { }
+            }
+        }
+    }
+
+    public static void SwapSellMobs()
+    {
+        while (true)
+        {
+            try { Console.Clear(); }
+            catch { }
+
+            Console.WriteLine("To sell an enemy, press its number and then 's'.");
+            Console.WriteLine("To swap enemies, press both their numbers.");
+            Console.WriteLine("To exit, press 0");
+
+            int i = 1;
+            foreach (Mob mob in MobBoard.Mobs)
+            {
+                Console.WriteLine(i + " - " + mob.MobName + " - " + (mob.MoneyCost + 1) / 2);
+                i++;
+            }
+
+            ConsoleKeyInfo playerMobChoiceObj1 = new();
+            char playerMobChoiceChar1;
+            try
+            {
+                playerMobChoiceObj1 = Console.ReadKey(true);
+                playerMobChoiceChar1 = playerMobChoiceObj1.KeyChar;
+            }
+            catch { playerMobChoiceChar1 = '0'; }
+            string playerMobChoiceString1 = playerMobChoiceChar1.ToString();
+
+            if (playerMobChoiceString1 == "0")
+                break;
+
+            Console.WriteLine();
+            Console.Write(playerMobChoiceString1 + " - ");
+
+            ConsoleKeyInfo playerMobChoiceObj2 = new();
+            char playerMobChoiceChar2;
+            try
+            {
+                playerMobChoiceObj2 = Console.ReadKey(true);
+                playerMobChoiceChar2 = playerMobChoiceObj2.KeyChar;
+            }
+            catch { playerMobChoiceChar2 = '0'; }
+            string playerMobChoiceString2 = playerMobChoiceChar2.ToString();
+
+            if (playerMobChoiceString2 == "0")
+                break;
+
+            Console.Write(playerMobChoiceString2);
+
+
+            if (playerMobChoiceString2 != "s")
+            {
+                try
+                {
+                    int playerMobChoice1 = Convert.ToInt32(playerMobChoiceString1);
+                    int playerMobChoice2 = Convert.ToInt32(playerMobChoiceString2);
+
+                    if (playerMobChoice1 > 0 && playerMobChoice2 > 0 &&
+                    playerMobChoice1 <= MobBoard.Mobs.Count() && playerMobChoice2 <= MobBoard.Mobs.Count())
+                    {
+                        MobBoard.SwapMobPositions(playerMobChoice1 - 1, playerMobChoice2 - 1);
+                    }
+                }
+                catch { }
+            }
+            else
+            {
+                try
+                {
+                    int playerMobChoice1 = Convert.ToInt32(playerMobChoiceString1);
+
+                    if (playerMobChoice1 > 0 && playerMobChoice1 <= MobBoard.Mobs.Count())
+                    {
+                        MobBoard.SellMob(playerMobChoice1 - 1);
+                    }
+                }
+                catch { }
+            }
+        }
     }
 
     public static List<Mob> GenerateMobs()

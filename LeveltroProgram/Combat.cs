@@ -16,6 +16,9 @@ public static class CombatRunner
         HandSize = handSize;
         Deck.CurrentDeck = new List<Spell>(Deck.FullDeck);
 
+
+        Deck.ReshuffleDiscardIn();
+
         for (int i = 0; i < handSize; i++)
         {
             Deck.Draw();
@@ -173,7 +176,16 @@ public static class CombatRunner
         if (CurrentScore >= ScoreBenchmark)
             EndCombat();
         else if (CurrentTurn <= TotalTurns)
+        {
+            for (int i = 0; i < damageToEachSlot.Count(); i++)
+            {
+                if (damageToEachSlot[i] == int.MaxValue)
+                {
+                    damageToEachSlot[i] = 0;
+                }
+            }
             PlayerTurn();
+        }
         else
             EndCombat();
     }
@@ -192,13 +204,13 @@ public static class CombatRunner
         }
 
         Console.WriteLine();
-        Console.Write($"@   ");
+        Console.Write($"ዲ   ");
 
         int slot = 0;
         foreach (Mob mob in MobBoard.Mobs)
         {
             if (mob.BaseHP - damageToEachSlot[slot] > 0)
-                Console.Write($"{mob.MobName}(HP: {mob.BaseHP - damageToEachSlot[slot]}/{mob.BaseHP} #: {mob.BaseQuantity} XP: {mob.BaseXPPerUnit * mob.BaseQuantity})  ");
+                Console.Write($"{mob.MobName}(HP: {mob.BaseHP - damageToEachSlot[slot]}/{mob.BaseHP} || #: {mob.BaseQuantity} || XP per #: {mob.BaseXPPerUnit})  ");
 
             slot++;
         }

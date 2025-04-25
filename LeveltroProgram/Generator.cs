@@ -27,15 +27,18 @@ public static class Generator
         for (int i = 0; i < 10; i++)
         {
             deck?.Add(AllSpells[0]);
+            // deck?.Add(AllSpells[3]);
         }
         Deck.FullDeck = deck;
     }
 
     public static void BuildInitialMobAndEnchant()
     {
-        MobBoard.Mobs.Add(AllMobs[0]);
-        MobBoard.Mobs.Add(AllMobs[0]);
-        EnchantmentBoard.Enchantments.Add(AllEnchantments[0]);
+        MobBoard.AddMob(AllMobs[0]);
+        MobBoard.AddMob(AllMobs[0]);
+        // MobBoard.AddMob(AllMobs[0]);
+        EnchantmentBoard.AddEnchantment(AllEnchantments[0]);
+        // EnchantmentBoard.AddEnchantment(AllEnchantments[1]);
     }
 
     public static void CreateAllMobs()
@@ -54,7 +57,12 @@ public static class Generator
     public static void CreateAllEnchantments()
     {
         AllEnchantments.Add(new Enchantment("Ambient Absorbtion", "[+5 XP] at the end of your turn.", 1, false, false, true, false, false, false, true, 0, () => CombatRunner.CurrentScore += 5));
-        AllEnchantments.Add(new Enchantment("Bolstering Backline", "[+5 Base Quantity] to furthest right enemy", 5, false, true, false, false, false, true, false, 1, () => { }));
+        AllEnchantments.Add(new Enchantment("Bolstering Backline", "Start of Combat: [+5 Permanent Quantity] to furthest right enemy", 5, false, true, false, false, true, false, false, 1, () =>
+        {
+            Mob mobToChange = MobBoard.Mobs[MobBoard.Mobs.Count() - 1];
+            mobToChange.BaseQuantity += 5;
+        }
+        ));
         AllEnchantments.Add(new Enchantment("XP Xealotry", "[+5 XP per Unit] to all enemies", 8, false, true, false, false, false, true, false, 2, () => { }));
 
         TotalCommonEnchantments = CountCommonEnchantments();

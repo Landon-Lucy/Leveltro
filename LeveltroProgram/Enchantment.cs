@@ -41,11 +41,19 @@ public static class EnchantmentBoard
 
     public static void AddEnchantment(Enchantment enchantment)
     {
-        EnchantmentBoard.Enchantments.Add(enchantment);
+        Enchantments.Add(new Enchantment(enchantment.Name, enchantment.EffectDescription, enchantment.MoneyCost, enchantment.AffectsSpells, enchantment.AffectsMobs, enchantment.AffectsScore, enchantment.GivesMoney, enchantment.StartOfCombat, enchantment.StartOfTurn, enchantment.EndOfTurn, enchantment.Rarity, enchantment.Effect));
     }
 
     public static void SwapEnchantmentPositions(int enchantmentSlot1, int enchantmentSlot2)
     {
+        Enchantment tempEnchantment = Enchantments[enchantmentSlot1];
+        Enchantments[enchantmentSlot1] = Enchantments[enchantmentSlot2];
+        Enchantments[enchantmentSlot2] = tempEnchantment;
+    }
 
+    public static void SellEnchantment(int enchantmentSlot)
+    {
+        PlayerInfo.CurrentMoney += (Enchantments[enchantmentSlot].MoneyCost + 1) / 2;
+        Enchantments.RemoveAt(enchantmentSlot);
     }
 }
