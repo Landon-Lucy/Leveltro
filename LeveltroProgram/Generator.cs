@@ -27,7 +27,7 @@ public static class Generator
         for (int i = 0; i < 10; i++)
         {
             deck?.Add(AllSpells[0]);
-            // deck?.Add(AllSpells[3]);
+            // deck?.Add(AllSpells[1]);
         }
         Deck.FullDeck = deck;
     }
@@ -57,13 +57,20 @@ public static class Generator
     public static void CreateAllEnchantments()
     {
         AllEnchantments.Add(new Enchantment("Ambient Absorbtion", "[+5 XP] at the end of your turn.", 1, false, false, true, false, false, false, true, 0, () => CombatRunner.CurrentScore += 5));
-        AllEnchantments.Add(new Enchantment("Bolstering Backline", "Start of Combat: [+5 Permanent Quantity] to furthest right enemy", 5, false, true, false, false, true, false, false, 1, () =>
+        AllEnchantments.Add(new Enchantment("Bolstering Backline", "Start of Combat: [+5 Permanent Quantity] and [+2 Permanent HP] to furthest right enemy", 5, false, true, false, false, true, false, false, 1, () =>
         {
             Mob mobToChange = MobBoard.Mobs[MobBoard.Mobs.Count() - 1];
             mobToChange.BaseQuantity += 5;
+            mobToChange.BaseHP += 2;
         }
         ));
-        AllEnchantments.Add(new Enchantment("XP Xealotry", "[+5 XP per Unit] to all enemies", 8, false, true, false, false, false, true, false, 2, () => { }));
+        AllEnchantments.Add(new Enchantment("XP Xealotry", "[+5 XP per Unit] to all enemies", 8, false, true, false, false, false, true, false, 2, () => 
+        {
+            foreach(Mob mob in MobBoard.Mobs)
+            {
+                mob.BaseXPPerUnit += 5;
+            }
+        }));
 
         TotalCommonEnchantments = CountCommonEnchantments();
         TotalUncommonEnchantments = CountUncommonEnchantments();

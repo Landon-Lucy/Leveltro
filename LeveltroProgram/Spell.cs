@@ -71,8 +71,13 @@ public static class Deck
         CurrentDeck = CurrentDeck.OrderBy(_ => rng.Next()).ToList();
     }
 
-        public static void AddSpell(Spell spell)
+    public static void AddSpell(Spell spell)
     {
         FullDeck.Add(spell);
+    }
+
+    public static void RemoveSpell(int indexToRemove)
+    {
+        FullDeck.RemoveAt(indexToRemove);
     }
 }

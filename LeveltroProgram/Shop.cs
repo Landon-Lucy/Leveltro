@@ -9,6 +9,7 @@ public static class ShopRunner
     public static List<Mob> shopMobs = new();
     public static List<Enchantment> shopEnchantments = new();
     public static List<Spell> shopSpells = new();
+    public static int costToRemove = 3;
 
     public static void GenerateShop()
     {
@@ -119,6 +120,7 @@ public static class ShopRunner
         Console.WriteLine("d - View Deck");
         Console.WriteLine("s - Swap or Sell Enchantments");
         Console.WriteLine("e - Swap or Sell Enemies");
+        Console.WriteLine($"c - Remove a card from your deck (${costToRemove})");
         playerPurchaseStep(numberIndicator - 1, shopMobs, shopEnchantments, shopSpells);
     }
 
@@ -140,18 +142,7 @@ public static class ShopRunner
 
             if (playerChoiceString == "d")
             {
-                try { Console.Clear(); }
-                catch { }
-
-                Console.WriteLine("Your Deck (Press any key to return to Shop)");
-                foreach (Spell spell in Deck.FullDeck)
-                {
-                    Console.WriteLine(spell.SpellName);
-                }
-
-                try { Console.ReadKey(true); }
-                catch { }
-
+                ViewDeck();
                 playerChoiceString = "0";
                 DisplayShop();
             }
@@ -166,6 +157,12 @@ public static class ShopRunner
             if (playerChoiceString == "e")
             {
                 SwapSellMobs();
+                playerChoiceString = "0";
+                DisplayShop();
+            }
+            if (playerChoiceString == "c" && Deck.FullDeck.Count() != 1)
+            {
+                ShopRemoveCard();
                 playerChoiceString = "0";
                 DisplayShop();
             }
@@ -319,6 +316,74 @@ public static class ShopRunner
                     }
                 }
                 catch { }
+            }
+        }
+    }
+
+    public static void ShopRemoveCard()
+    {
+        for (int page = 1; page <= (Deck.FullDeck.Count() / 10) + 1; page++)
+        {
+            Console.Clear();
+
+            for (int i = 0 + (page - 1) * 10; i < page * 10; i++)
+            {
+                try
+                {
+                    Console.WriteLine($"{i % 10} - {Deck.FullDeck[i].SpellName} ({Deck.FullDeck[i].SpellDescription})");
+                }
+                catch { }
+            }
+
+            if (Deck.FullDeck.Count() % 10 != 0)
+                Console.WriteLine($"Page {page} / {(Deck.FullDeck.Count() / 10) + 1}");
+            else
+                Console.WriteLine($"Page {page} / {Deck.FullDeck.Count() / 10}");
+
+
+
+            if (page != (Deck.FullDeck.Count() / 10) + 1 && (Deck.FullDeck.Count() / 10) + (Deck.FullDeck.Count() % 10) != page)
+                Console.WriteLine("Press 'd' to go to the next page");
+
+            if (page != 1)
+                Console.WriteLine("Press 'a' to go to the previous page");
+
+            ConsoleKeyInfo playerRemoveChoiceObj = new();
+            char playerRemoveChoiceChar;
+            try
+            {
+                playerRemoveChoiceObj = Console.ReadKey(true);
+                playerRemoveChoiceChar = playerRemoveChoiceObj.KeyChar;
+            }
+            catch { playerRemoveChoiceChar = '0'; }
+            string playerRemoveChoiceString = playerRemoveChoiceChar.ToString();
+
+            if (playerRemoveChoiceString == "d" && page != (Deck.FullDeck.Count() / 10) + 1 && (Deck.FullDeck.Count() / 10) + (Deck.FullDeck.Count() % 10) != page)
+                continue;
+
+            if (playerRemoveChoiceString == "a" && page != 1)
+            {
+                page -= 2;
+                continue;
+            }
+
+            int playerRemoveChoice;
+            try
+            {
+                playerRemoveChoice = Convert.ToInt32(playerRemoveChoiceString);
+            }
+            catch { page--; continue; }
+
+            if (playerRemoveChoice >= 0 && playerRemoveChoice <= 9)
+            {
+                try
+                {
+                    Deck.RemoveSpell(playerRemoveChoice + ((page - 1) * 10));
+                    PlayerInfo.CurrentMoney -= costToRemove;
+                    costToRemove += 1;
+                    return;
+                }
+                catch { page--; continue; }
             }
         }
     }
@@ -619,5 +684,40 @@ public static class ShopRunner
             }
         }
         return returnList;
+    }
+
+    public static void ViewDeck()
+    {
+        try { Console.Clear(); }
+        catch { }
+
+        Console.WriteLine("Your Deck (Press any key to return to Shop)");
+
+        Dictionary<string, int> spellDict = new();
+
+        foreach (Spell spell in Deck.FullDeck)
+        {
+            if (!spellDict.ContainsKey(spell.SpellName))
+            {
+                spellDict.Add(spell.SpellName, 1);
+            }
+            else
+            {
+                spellDict[spell.SpellName]++;
+            }
+        }
+
+        List<string> seenSpells = new();
+        foreach (Spell spell in Deck.FullDeck)
+        {
+            if (!seenSpells.Contains(spell.SpellName))
+            {
+                seenSpells.Add(spell.SpellName);
+                Console.WriteLine($"{spell.SpellName} x{spellDict[spell.SpellName]}");
+            }
+        }
+
+        try { Console.ReadKey(true); }
+        catch { }
     }
 }
